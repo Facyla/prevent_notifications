@@ -14,7 +14,11 @@ Exceptions might happen for plugins which do not use the notification queue nor 
 
 
 ## History
- - 1.8.0 : new versionning
+ - 1.12.0 : 201602159 - operational Elgg 1.12 version
+	 - rewrite blocking method : use enqueue, notification hook
+	 - add README.md file
+	 - add default setting to "no" in embed context
+ - 0.3 : 20160129 - ported to Elgg 1.12 (not functionnal)
  - 0.2 : 20150812
 	 - file tools support (folders) 
  - 0.1 : avril 2013

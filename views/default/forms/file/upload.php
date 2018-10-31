@@ -5,6 +5,8 @@
  * @package ElggFile
  */
 
+// Adds prevent_notification form field
+
 // once elgg_view stops throwing all sorts of junk into $vars, we can use 
 $title = elgg_extract('title', $vars, '');
 $desc = elgg_extract('description', $vars, '');
@@ -24,7 +26,21 @@ if ($guid) {
 	$submit_label = elgg_echo('upload');
 }
 
+// Get post_max_size and upload_max_filesize
+$post_max_size = elgg_get_ini_setting_in_bytes('post_max_size');
+$upload_max_filesize = elgg_get_ini_setting_in_bytes('upload_max_filesize');
+
+// Determine the correct value
+$max_upload = $upload_max_filesize > $post_max_size ? $post_max_size : $upload_max_filesize;
+
+$upload_limit = elgg_echo('file:upload_limit', array(elgg_format_bytes($max_upload)));
+
+$is_embed = false;
+if (elgg_in_context('embed')) { $is_embed = true; }
 ?>
+<div class="mbm elgg-text-help">
+	<?php echo $upload_limit; ?>
+</div>
 <div>
 	<label><?php echo $file_label; ?></label><br />
 	<?php echo elgg_view('input/file', array('name' => 'upload')); ?>
@@ -43,11 +59,12 @@ if ($guid) {
 </div>
 
 <?php
+// File tools support
 if (elgg_is_active_plugin('file_tools')) {
 	if(file_tools_use_folder_structure()){
 		$parent_guid = 0;
 		if($file = elgg_extract("entity", $vars)){
-			if($folders = $file->getEntitiesFromRelationship(FILE_TOOLS_RELATIONSHIP, true, 1)){
+		if($folders = $file->getEntitiesFromRelationship(array('relationship'=>FILE_TOOLS_RELATIONSHIP, 'inverse_relationship'=>true, 'limit'=>1))){
 				$parent_guid = $folders[0]->getGUID();
 			}
 		}
@@ -71,7 +88,13 @@ if ($categories) {
 ?>
 <div>
 	<label><?php echo elgg_echo('access'); ?></label><br />
-	<?php echo elgg_view('input/access', array('name' => 'access_id', 'value' => $access_id)); ?>
+	<?php echo elgg_view('input/access', array(
+		'name' => 'access_id',
+		'value' => $access_id,
+		'entity' => get_entity($guid),
+		'entity_type' => 'object',
+		'entity_subtype' => 'file',
+	)); ?>
 </div>
 <div class="elgg-foot">
 <?php
@@ -82,7 +105,10 @@ if ($guid) {
 	echo elgg_view('input/hidden', array('name' => 'file_guid', 'value' => $guid));
 }
 
-if (!$vars['entity']) echo elgg_view('prevent_notifications/prevent_form_extend', array());
+// Note : select defaults to no notification in embed context
+if (!$vars['entity'] || $is_embed) {
+	echo elgg_view('prevent_notifications/prevent_form_extend', array());
+}
 
 echo elgg_view('input/submit', array('value' => $submit_label));
 
