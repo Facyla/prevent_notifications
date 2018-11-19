@@ -56,8 +56,10 @@ if ($categories) {
 	<?php echo elgg_view('input/access', array('name' => 'access_id', 'value' => $access_id)); ?>
 </div>
 
+<?php
 // Prevent_notification
-<?php if (!$guid) echo elgg_view('prevent_notifications/prevent_form_extend', array()); ?>
+if (!$guid) echo elgg_view('prevent_notifications/prevent_form_extend', array());
+?>
 
 <div>
 	<?php

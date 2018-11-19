@@ -12,6 +12,11 @@ It also presets the notification setting to "no" when embedding content (eg. emb
 This works by passing a special parameter that basically tells "don't notify anyone" when a new objet is created. The notification process is blocked and **no one** shoud receive anything. 
 Exceptions might happen for plugins which do not use the notification queue nor the notifications-related hooks, eg. a plugin that makes a direct call in its action to an email sending function that does not trigger any hook.
 
+Supported object types : blog, bookmarks, brainstorm, discussion, event_calendar, file, file_tools, pages, videos
+
+To support new object types, update your form and add the next line just above the submit button:
+    if (!$vars['entity']) { echo elgg_view('prevent_notifications/prevent_form_extend', array()); }
+
 
 ## History
  - 1.12.0 : 201602159 - operational Elgg 1.12 version
